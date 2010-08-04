@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W4C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" dir="ltr" lang="en">
+<head>
+	<title>APE Demo (ProcessingJS Game)</title>
+	<style type="text/css">
+		body {
+			margin: 10px;
+			padding: 0;
+			
+			font-family: Tahoma;
+			font-size: 12px;
+		}
+		
+		div#apeControllerDemo {
+			margin: 10px 0;
+			padding: 10px;
+			
+			border: 1px solid #e2e2e2;
+			background: #f2f2f2;
+		}
+		
+		div#apeControllerDemo div.message {
+			padding: 5px 0;
+			border-bottom: 1px solid #bbb;
+		}
+		
+		div#apeControllerDemo div.message:last-child {
+			border-bottom: 0;
+		}
+	</style>
+	
+	<script type="text/javaScript" src="../../Clients/mootools-core.js"></script>
+	<script type="text/javaScript" src="../../Clients/MooTools.js"></script>
+	<!--script type="text/javaScript" src="../config80.js"></script-->
+	<script type="text/javaScript" src="../config.js"></script>
+	<script type="text/javaScript" src="demo-pjs-game.js"></script>
+	<script type="text/javaScript" src="../lib/processing/processing-0.9.4.js"></script>
+</head>
+<body>
+
+	<script id="sketch" type="application/processing">
+		// All Examples Written by Casey Reas and Ben Fry  
+		// unless otherwise stated.  
+		// Global variables for the ball  
+		float ball_x;  
+		float ball_y;  
+		float ball_dir = 1;  
+		float ball_size = 5;  // Radius  
+		float dy = 0;  // Direction  
+		
+		// Global variables for the paddle  
+		int paddle_width = 5;  
+		int paddle_height = 20;  
+		
+		int dist_wall = 15;  
+		
+		void setup()  
+		{  
+			size(200, 200);  
+			rectMode(CENTER_RADIUS);  
+			ellipseMode(CENTER_RADIUS);  
+			noStroke();  
+			smooth();  
+			ball_y = height/2;  
+			ball_x = 1;  
+		}  
+		
+		void draw()   
+		{  
+			background(51);  
+				
+			ball_x += ball_dir * 1.0;  
+			ball_y += dy;  
+			if(ball_x > width+ball_size) {  
+				ball_x = -width/2 - ball_size;  
+				ball_y = random(0, height);  
+				dy = 0;  
+			}  
+				
+			// Constrain paddle to screen  
+			float paddle_y = constrain(cmouseY, paddle_height, height-paddle_height);  
+		
+			// Test to see if the ball is touching the paddle  
+			float py = width-dist_wall-paddle_width-ball_size;  
+			if(ball_x == py   
+				 && ball_y > paddle_y - paddle_height - ball_size   
+				 && ball_y < paddle_y + paddle_height + ball_size) {  
+				ball_dir *= -1;  
+				if(cmouseY != cpmouseY) {  
+				  dy = (cmouseY-cpmouseY)/2.0;  
+				  if(dy >  5) { dy =  5; }  
+				  if(dy < -5) { dy = -5; }  
+				}  
+			}   
+				
+			// If ball hits paddle or back wall, reverse direction  
+			if(ball_x < ball_size && ball_dir == -1) {  
+				ball_dir *= -1;  
+			}  
+				
+			// If the ball is touching top or bottom edge, reverse direction  
+			if(ball_y > height-ball_size) {  
+				dy = dy * -1;  
+			}  
+			if(ball_y < ball_size) {  
+				dy = dy * -1;  
+			}  
+		
+			// Draw ball  
+			fill(255);  
+			ellipse(ball_x, ball_y, ball_size, ball_size);  
+				
+			// Draw the paddle  
+			fill(153);  
+			rect(width-dist_wall, paddle_y, paddle_width, paddle_height);    
+		}  
+	</script>
+
+	<script>
+		(function() {
+			var init = function() { 
+				var canvas=document.getElementById("canvas");
+				var sketch=document.getElementById("sketch").text;
+				Processing(canvas,sketch);
+			}
+			addEventListener("DOMContentLoaded", init, false);
+		})();
+	</script> 
+
+	<script type="text/javaScript">
+		window.addEvent('domready', function(){
+			var client = new APE.Controller({
+				container: $('apeControllerDemo')
+			});
+			client.load({
+				identifier: 'action',
+				channel: 'testchannel'
+			});
+		});
+	</script>
+ 
+	<div>
+		Demo using APE (Ajax Push Engine), default transport protocol (long polling): 
+		<ul> Instructions:
+			<li>Set your APE server address in the demo.php.</li>
+			<li>Load this demo.html page.</li>
+		  <li>Click the Start button to start receiving data from 3 ADC channels.</li>
+			<li>You will see messages appear in the element down below.</li>
+			<li>Click the Stop button to stop receiving data.</li>
+		</ul>
+	 	
+    <input type="submit" value="Start" onClick="new Request.HTML().get('./demoStart.php');"/>
+    <input type="submit" value="Stop" onClick="new Request.HTML().get('./demoStop.php');"/>
+
+		<br />
+
+		<canvas id="canvas" width="255" height="255"></canvas> 
+
+		<div id="apeControllerDemo">
+			<ul>Debug:
+				<li id="element1"></li>
+				<li id="element2"></li>
+			</ul>
+		</div>
+	</div>
+
+</body>
+</html>

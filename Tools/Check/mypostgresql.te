@@ -1,0 +1,5 @@
+
+policy_module(mypostgresql, 1.0)
+
+
+
