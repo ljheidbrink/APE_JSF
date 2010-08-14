@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	xmlns="code.*"
+    styleName = "plain"
+	layout="absolute"
+	creationComplete="creationComplete()"
+	currentState="MainMenu">
+
+    <mx:states>
+      <mx:State
+        name="Game"
+        enterState="enterGame(event)"
+        exitState="exitGame(event)">
+      </mx:State>
+      <mx:State name="GameOver">
+        <mx:AddChild relativeTo="{canvas}" position="lastChild">
+          <mx:Button 
+            label="Play Again" 
+            id="btnPlayAgain" 
+            click="playAgainClicked(event)" 
+            x="380" y="344" 
+            width="90" height="30"/>
+        </mx:AddChild>
+        <mx:AddChild relativeTo="{canvas}" position="lastChild">
+          <mx:Label 
+            text="Game over! Click the button below to play again." 
+            x="10" y="10" 
+            width="300" height="30"/>
+        </mx:AddChild>
+      </mx:State>
+      <mx:State name="MainMenu">
+        <mx:AddChild relativeTo="{canvas}" position="lastChild">
+          <mx:Button 
+            label="Start" 
+            id="btnStart" 
+            click="startGameClicked(event)" 
+            x="380" y="344" 
+            width="90" height="30"/>
+        </mx:AddChild>
+      </mx:State>  
+    </mx:states>
+    
+	<mx:Script>
+        <![CDATA[
+        	protected var inGame:Boolean = false;
+        	
+            public function creationComplete():void
+            {
+            	canvas.startup();
+            }
+            protected function startGameClicked(event:Event):void
+            {
+            	currentState = "Game";
+                canvas.init();
+            }
+            protected function enterGame(event:Event):void
+            {
+            	Mouse.hide();
+            	inGame = true;
+            }
+            protected function exitGame(event:Event):void
+            {
+            	Mouse.show();
+            	inGame = false;
+            }
+            protected function playAgainClicked(event:Event):void
+            {
+            	currentState = "Game";
+            	canvas.init();
+            }
+            
+		]]>
+	</mx:Script>
+
+  <MyGameCanvas id="canvas" width="100%" height="100%" themeColor="#ffffff"/>
+  
+</mx:Application>
+
